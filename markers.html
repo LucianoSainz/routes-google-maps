@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <section>
+      <div id="map"></div>
+    </section>
+    <script>
+      // https://developers.google.com/maps/documentation/javascript/reference
+      let map;
+      let directionsService;
+      let directionsRenderer;
+      let m1, m2;
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: new google.maps.LatLng(40.3922301, -3.6998982),
+          zoom: 15
+        });
+
+        m1 = new google.maps.Marker({
+          map: map,
+          draggable: true,
+          position: new google.maps.LatLng(40.3922301, -3.6998982)
+        });
+
+        m2 = new google.maps.Marker({
+          map: map,
+          draggable: true,
+          position: new google.maps.LatLng(40.4022301, -3.7098982)
+        });
+
+        google.maps.event.addListener(m1, "dragend", function() {
+          directionsRenderer.setMap(null);
+          paintRoute();
+        });
+
+        google.maps.event.addListener(m2, "dragend", function() {
+          directionsRenderer.setMap(null);
+          paintRoute();
+        });
+
+        function paintRoute() {
+          directionsService = new google.maps.DirectionsService();
+          directionsRenderer = new google.maps.DirectionsRenderer();
+
+          const directionRequest = {
+            origin: { lat: m1.position.lat(), lng: m1.position.lng() },
+            destination: { lat: m2.position.lat(), lng: m2.position.lng() },
+            travelMode: "DRIVING"
+          };
+
+          directionsService.route(directionRequest, function(response, status) {
+            if (status === "OK") {
+              // everything is ok
+              directionsRenderer.setDirections(response);
+            } else {
+              // something went wrong
+              window.alert("Directions request failed due to " + status);
+            }
+          });
+
+          directionsRenderer.setMap(map);
+        }
+
+        paintRoute();
+      }
+    </script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4LYJg8vJP5GC3JF9XC8aydQ1-osJIReA&callback=initMap"
+      async
+      defer
+    ></script>
+  </body>
+</html>
